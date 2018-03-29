@@ -1,0 +1,31 @@
+{
+  "name": "etoken_contracts",
+  "version": "1.0.0",
+  "description": "EToken ecosystem contracts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Ambisafe/etoken_contracts.git"
+  },
+  "scripts": {
+    "compile": "truffle compile",
+    "test": "truffle test",
+    "testrpc": "testrpc",
+    "truffle": "truffle"
+  },
+  "keywords": [
+    "etoken",
+    "multiasset",
+    "ethereum"
+  ],
+  "author": "Oleksii Matiiasevych <oleksii@ambisafe.co> (Ambisafe Inc.)",
+  "license": "https://www.ambisafe.co/terms-of-use/",
+  "bugs": {
+    "url": "https://github.com/Ambisafe/etoken_contracts/issues"
+  },
+  "homepage": "https://github.com/Ambisafe/etoken_contracts",
+  "dependencies": {
+    "ethereumjs-testrpc": "3.0.3",
+    "truffle": "1.0.3"
+  },
+  "devDependencies": {}
+}
