@@ -8,30 +8,54 @@ import "../../ownership/Ownable.sol";
  * @dev The UserManagement contract manage user using its hash.
  */
 contract UserManagement {
-    event AddedUser(string indexed hash);
-    event RemovedUser(string indexed hash);
+    event AddedUser(bytes32 indexed hash, uint id);
+    event RemovedUser(bytes32 indexed hash, uint id);
+    event UpdatedUser(bytes32 indexed oldHash, bytes32 indexed newHash, uint id);
 
-    string[] userHash;
-    mapping(string => uint256) userHashIndex;
+    bytes32[] userHash;
+    mapping(bytes32 => uint256) userHashIndex;
 
     /**
      * @dev Add new user hash from IPFS.
-     * @param hash The hash string to represent user stored on IPFS.
+     * @param hash The hash bytes32 to represent user stored on IPFS.
      */
-    function AddUserHash(string hash) onlyOwner public {
+    function AddUserHash(bytes32 hash) onlyOwner public {
 
         uint id = userHash.length;
         userHashIndex[hash] = id;
         userHash.push(hash);
-        AddedUser(hash);
+        AddedUser(hash, id);
+
+    }
+
+    /**
+     * @dev Check user hash from IPFS.
+     * @param hash The hash bytes32 to represent user stored on IPFS.
+     */
+    function CheckUserHash(bytes32 hash) onlyOwner public returns (bool) {
+
+        uint id = userHashIndex[hash];
+        return id != 0;
+
+    }
+
+    /**
+     * @dev Update user hash from IPFS.
+     * @param hash The hash bytes32 to represent user stored on IPFS.
+     */
+    function UpdateUserHash(bytes32 oldHash, bytes32 newHash) onlyOwner public {
+
+        uint id = userHashIndex[oldHash];
+        userHash[id] = newHash;
+        UpdatedUser(oldHash, newHash, id);
 
     }
 
     /**
      * @dev Remove registered user hash.
-     * @hash The hash string to represent user stored on IPFS.
+     * @param hash The hash bytes32 to represent user stored on IPFS.
      */
-    function removeUserHash(string hash) onlyOwner public {
+    function RemoveUserHash(bytes32 hash) onlyOwner public {
 
         uint id = userHashIndex[hash];
         delete userHash[id];
