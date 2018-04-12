@@ -1,0 +1,20 @@
+.idea
+
+# Logs
+logs
+*.log
+
+# Dependency directory
+node_modules
+
+# Debug log from npm
+npm-debug.log
+
+# local env variables
+.env
+
+# truffle build directory
+build/
+
+# lol macs
+.DS_Store/
