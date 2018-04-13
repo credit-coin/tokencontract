@@ -18,3 +18,5 @@ build/
 
 # lol macs
 .DS_Store/
+
+local/
