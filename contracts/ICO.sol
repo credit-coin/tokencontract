@@ -181,20 +181,19 @@ contract Crowdsale is SafeMath, Pausable, PullPayment {
     uint firstPeriod;
     uint secondPeriod;
     uint thirdPeriod;
+    uint fourthPeriod;
+    uint fifthPeriod;
     uint firstBonus;
     uint secondBonus;
     uint thirdBonus;
+    uint fourthBonus;
+    uint fifthBonus;
     uint public multiplier;
     uint public status;
 
     // Looping through Backer
     mapping(address => Backer) public backers; //backer list
     address[] public backersIndex;   // to be able to iterate through backers when distributing the tokens
-
-    // Whitelist
-    mapping (address => bool) public whitelisted;
-    event Whitelist(address indexed participant);
-
 
     // @notice to verify if action is not performed out of the campaign range
     modifier respectTimeFrame() {
@@ -243,12 +242,17 @@ contract Crowdsale is SafeMath, Pausable, PullPayment {
         campaignDurationDays = _campaignDurationDays;
         totalTokensSent = 0;
         //TODO fill these following values as correct one when deploy contract
-        firstPeriod = _firstPeriod;
-        secondPeriod = _secondPeriod;
-        thirdPeriod = _thirdPeriod;
-        firstBonus = _firstBonus;
-        secondBonus = _secondBonus;
-        thirdBonus = _thirdBonus;
+        firstPeriod = 100;
+        secondPeriod = 200;
+        thirdPeriod = 300;
+        fourthPeriod = 400;
+        fifthPeriod = 500;
+
+        firstBonus = 120;
+        secondBonus = 115;
+        thirdBonus = 110;
+        fourthBonus = safeDiv(1075, 10);
+        fifthBonus = 105;
     }
 
     // @notice Specify address of token contract
@@ -262,7 +266,7 @@ contract Crowdsale is SafeMath, Pausable, PullPayment {
 
     // {fallback function}
     // @notice It will call internal function which handles allocation of Ether and calculates tokens.
-    function() payable onlyPayloadSize {
+    function() payable onlyPayloadSize(2) {
         contribute(msg.sender);
     }
 
@@ -319,18 +323,12 @@ contract Crowdsale is SafeMath, Pausable, PullPayment {
             return tokenAmount + safeDiv(safeMul(tokenAmount, secondBonus), 100);
         else if (block.number <= startBlock + thirdPeriod)
             return tokenAmount + safeDiv(safeMul(tokenAmount, thirdBonus), 100);
+        else if (block.number <= startBlock + fourthPeriod)
+            return tokenAmount + safeDiv(safeMul(tokenAmount, fourthBonus), 100);
+        else if (block.number <= startBlock + fifthPeriod)
+            return tokenAmount + safeDiv(safeMul(tokenAmount, fifthBonus), 100);
         else
             return tokenAmount;
-    }
-
-    function WhitelistParticipant(address participant) external onlyAuthorized{
-        whitelist[participant] = true;
-        Whitelist(participant);
-    }
-
-    function BlacklistParticipant(address participant) external onlyAuthorized{
-        whitelist[participant] = false;
-        Whitelist(participant);
     }
 }
 
@@ -348,6 +346,9 @@ contract Token is ERC20, SafeMath, Ownable {
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
+    // Whitelist
+    mapping (address => bool) public whitelisted;
+    event Whitelist(address indexed participant);
 
     // Lock transfer during the ICO
     modifier onlyUnlocked() {
@@ -435,4 +436,15 @@ contract Token is ERC20, SafeMath, Ownable {
     function allowance(address _owner, address _spender) constant returns (uint remaining) {
         return allowed[_owner][_spender];
     }
+
+    function WhitelistParticipant(address participant) external onlyAuthorized{
+        whitelisted[participant] = true;
+        Whitelist(participant);
+    }
+
+    function BlacklistParticipant(address participant) external onlyAuthorized{
+        whitelisted[participant] = false;
+        Whitelist(participant);
+    }
+
 }
