@@ -198,10 +198,10 @@ contract CCOIN is ERC20, SafeMath, Ownable {
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) public onlyUnlocked returns (bool success) {
         if (balances[_from] < _value)
-            revert();
+        revert();
         // Check if the sender has enough
         if (_value > allowed[_from][msg.sender])
-            revert();
+        revert();
         // Check allowance
         balances[_from] = safeSub(balances[_from], _value);
         // Subtract from the sender
@@ -226,12 +226,12 @@ contract CCOIN is ERC20, SafeMath, Ownable {
         return allowed[_owner][_spender];
     }
 
-    function WhitelistParticipant(address participant) external onlyAuthorized {
+    function WhitelistParticipant(address participant) external onlyAuthorized{
         whitelisted[participant] = true;
         emit Whitelist(participant);
     }
 
-    function BlacklistParticipant(address participant) external onlyAuthorized {
+    function BlacklistParticipant(address participant) external onlyAuthorized{
         whitelisted[participant] = false;
         emit Whitelist(participant);
     }
@@ -248,18 +248,18 @@ contract CCOIN is ERC20, SafeMath, Ownable {
     function contribute(address _backer) internal returns (bool res) {
         // stop when required minimum is not sent
         if (msg.value < minContributionETH)
-            revert();
+        revert();
 
         // calculate number of tokens
         uint tokensToSend = calculateNoOfTokensToSend();
 
         // Ensure that max cap hasn't been reached
         if (safeAdd(totalTokensSent, tokensToSend) > maxCap)
-            revert();
+        revert();
 
         // Transfer tokens to contributor
         if (!transfer(_backer, tokensToSend))
-            revert();
+        revert();
 
         ethReceived = safeAdd(ethReceived, msg.value);
         totalTokensSent = safeAdd(totalTokensSent, tokensToSend);
@@ -271,17 +271,17 @@ contract CCOIN is ERC20, SafeMath, Ownable {
     function calculateNoOfTokensToSend() constant internal returns (uint) {
         uint tokenAmount = safeDiv(safeMul(msg.value, multiplier), tokenPriceWei);
         if (block.number <= startBlock + firstPeriod)
-            return tokenAmount + safeDiv(safeMul(tokenAmount, firstBonus), 100);
+        return tokenAmount + safeDiv(safeMul(tokenAmount, firstBonus), 100);
         else if (block.number <= startBlock + secondPeriod)
-            return tokenAmount + safeDiv(safeMul(tokenAmount, secondBonus), 100);
+        return tokenAmount + safeDiv(safeMul(tokenAmount, secondBonus), 100);
         else if (block.number <= startBlock + thirdPeriod)
-            return tokenAmount + safeDiv(safeMul(tokenAmount, thirdBonus), 100);
+        return tokenAmount + safeDiv(safeMul(tokenAmount, thirdBonus), 100);
         else if (block.number <= startBlock + fourthPeriod)
-            return tokenAmount + safeDiv(safeMul(tokenAmount, fourthBonus), 100);
+        return tokenAmount + safeDiv(safeMul(tokenAmount, fourthBonus), 100);
         else if (block.number <= startBlock + fifthPeriod)
-            return tokenAmount + safeDiv(safeMul(tokenAmount, fifthBonus), 100);
+        return tokenAmount + safeDiv(safeMul(tokenAmount, fifthBonus), 100);
         else
-            return tokenAmount;
+        return tokenAmount;
     }
 
 }
