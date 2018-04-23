@@ -127,6 +127,7 @@ contract CCOIN is ERC20, SafeMath, Ownable {
     event Unlocked();
     event StoppedCrowdsale();
     event RestartedCrowdsale();
+    event Burned(uint256 value);
 
     // Lock transfer during the ICO
     modifier onlyUnlocked() {
@@ -193,6 +194,7 @@ contract CCOIN is ERC20, SafeMath, Ownable {
         balances[_member] = safeSub(balances[_member], _value);
         totalSupply = safeSub(totalSupply, _value);
         emit Transfer(_member, 0x0, _value);
+        emit Burned(_value);
         return true;
     }
 
