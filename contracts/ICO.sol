@@ -123,6 +123,10 @@ contract CCOIN is ERC20, SafeMath, Ownable {
     mapping(address => bool) public whitelisted;
 
     event Whitelist(address indexed participant);
+    event Locked();
+    event Unlocked();
+    event StoppedCrowdsale();
+    event RestartedCrowdsale();
 
     // Lock transfer during the ICO
     modifier onlyUnlocked() {
@@ -177,10 +181,12 @@ contract CCOIN is ERC20, SafeMath, Ownable {
 
     function unlock() public onlyAuthorized {
         locked = false;
+        emit Unlocked();
     }
 
     function lock() public onlyAuthorized {
         locked = true;
+        emit Locked();
     }
 
     function burn(address _member, uint256 _value) public onlyAuthorized returns (bool) {
@@ -288,10 +294,12 @@ contract CCOIN is ERC20, SafeMath, Ownable {
 
     function stopCrowdsale() external onlyOwner{
         stopInEmergency = true;
+        emit StoppedCrowdsale();
     }
 
     function restartCrowdsale() external onlyOwner{
         stopInEmergency = false;
+        emit RestartedCrowdsale();
     }
 
 }
