@@ -114,6 +114,8 @@ contract CCOIN is ERC20, SafeMath, Ownable {
     uint fifthBonus;
     uint public multiplier;
 
+    bool public stopInEmergency = false;
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
@@ -282,6 +284,14 @@ contract CCOIN is ERC20, SafeMath, Ownable {
             return tokenAmount + safeDiv(safeMul(tokenAmount, fifthBonus), 100);
         else
             return tokenAmount;
+    }
+
+    function stopCrowdsale() external onlyOwner{
+        stopInEmergency = true;
+    }
+
+    function restartCrowdsale() external onlyOwner{
+        stopInEmergency = false;
     }
 
 }
