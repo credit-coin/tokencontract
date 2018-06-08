@@ -1,0 +1,12 @@
+{
+  "name": "tokencontract",
+  "version": "1.0.0",
+  "description": "Credit Coin Token & ICO",
+  "main": "index.js",
+  "repository": "https://github.com/credit-coin/tokencontract.git",
+  "author": "CCoin",
+  "license": "MIT",
+  "dependencies": {
+    "openzeppelin-solidity": "^1.10.0"
+  }
+}

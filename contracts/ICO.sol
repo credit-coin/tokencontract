@@ -1,36 +1,6 @@
 pragma solidity ^0.4.22;
 
-
-/**
- * @title SafeMath
- * @dev Math operations with safety checks that throw on error
- */
-contract SafeMath {
-    function safeMul(uint a, uint b) pure internal returns (uint) {
-        if (a == 0) {
-            return 0;
-        }
-        uint c = a * b;
-        assert(a == 0 || c / a == b);
-        return c;
-    }
-
-    function safeDiv(uint a, uint b) pure internal returns (uint) {
-        return a / b;
-    }
-
-    function safeSub(uint a, uint b) pure internal returns (uint) {
-        assert(b <= a);
-        return a - b;
-    }
-
-    function safeAdd(uint a, uint b) pure internal returns (uint) {
-        uint c = a + b;
-        assert(c >= a);
-        return c;
-    }
-}
-
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
 /**
  * @title ERC20 interface
@@ -83,7 +53,7 @@ contract Ownable {
 
 
 // Token Contract
-contract CCOIN is ERC20, SafeMath, Ownable {
+contract CCOIN is ERC20, Ownable {
     // Public variables of the token
     string public constant name = "CCOIN";
     string public constant symbol = "CCOIN";
@@ -91,8 +61,8 @@ contract CCOIN is ERC20, SafeMath, Ownable {
     uint public totalSupply = 1000000000 * 10 ** 18;
     bool public locked;
 
-    address public multisigETH; // Multisig contract that will receive the ETH
-    address public crowdSaleAddress; // Crowdsale address
+    address public multisigETH; // SafeMath.multisig contract that will receive the ETH
+    address public crowdSaleaddress; // Crowdsale address
     uint public ethReceived; // Number of ETH received
     uint public totalTokensSent; // Number of tokens sent to ETH contributors
     uint public startBlock; // Crowdsale start block
@@ -131,7 +101,7 @@ contract CCOIN is ERC20, SafeMath, Ownable {
 
     // Lock transfer during the ICO
     modifier onlyUnlocked() {
-        if (msg.sender != crowdSaleAddress && locked && msg.sender != owner)
+        if (msg.sender != crowdSaleaddress && locked && msg.sender != owner)
             revert();
         _;
     }
@@ -143,7 +113,7 @@ contract CCOIN is ERC20, SafeMath, Ownable {
     }
 
     modifier onlyAuthorized() {
-        if (msg.sender != crowdSaleAddress && msg.sender != owner)
+        if (msg.sender != crowdSaleaddress && msg.sender != owner)
             revert();
         _;
     }
@@ -152,15 +122,13 @@ contract CCOIN is ERC20, SafeMath, Ownable {
     constructor() public {
         locked = true;
         multiplier = 10 ** 18;
-        //balances[crowdSaleAddress] = 700000000 * multiplier;
-
 
         multisigETH = 0x701e600d07C2bD97f11F92F23d7ae8460f5181f4;
         minContributionETH = 1;
         startBlock = 0;
         endBlock = 0;
         maxCap = 1000 * multiplier;
-        tokenPriceWei = safeDiv(1, 1400);
+        tokenPriceWei = SafeMath.div(1, 1400);
         minCap = 100 * multiplier;
         totalTokensSent = 0;
         firstPeriod = 100;
@@ -172,12 +140,12 @@ contract CCOIN is ERC20, SafeMath, Ownable {
         firstBonus = 120;
         secondBonus = 115;
         thirdBonus = 110;
-        fourthBonus = safeDiv(1075, 10);
+        fourthBonus = SafeMath.div(1075, 10);
         fifthBonus = 105;
     }
 
-    function resetCrowdSaleAddress(address _newCrowdSaleAddress) public onlyAuthorized() {
-        crowdSaleAddress = _newCrowdSaleAddress;
+    function resetCrowdSaleaddress(address _newCrowdSaleaddress) public onlyAuthorized() {
+        crowdSaleaddress = _newCrowdSaleaddress;
     }
 
     function unlock() public onlyAuthorized {
@@ -191,16 +159,16 @@ contract CCOIN is ERC20, SafeMath, Ownable {
     }
 
     function burn(address _member, uint256 _value) public onlyAuthorized returns (bool) {
-        balances[_member] = safeSub(balances[_member], _value);
-        totalSupply = safeSub(totalSupply, _value);
+        balances[_member] = SafeMath.sub(balances[_member], _value);
+        totalSupply = SafeMath.sub(totalSupply, _value);
         emit Transfer(_member, 0x0, _value);
         emit Burned(_value);
         return true;
     }
 
     function transfer(address _to, uint _value) public onlyUnlocked returns (bool) {
-        balances[msg.sender] = safeSub(balances[msg.sender], _value);
-        balances[_to] = safeAdd(balances[_to], _value);
+        balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value);
+        balances[_to] = SafeMath.add(balances[_to], _value);
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
@@ -213,11 +181,11 @@ contract CCOIN is ERC20, SafeMath, Ownable {
         if (_value > allowed[_from][msg.sender])
             revert();
         // Check allowance
-        balances[_from] = safeSub(balances[_from], _value);
-        // Subtract from the sender
-        balances[_to] = safeAdd(balances[_to], _value);
-        // Add the same to the recipient
-        allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender], _value);
+        balances[_from] = SafeMath.sub(balances[_from], _value);
+        // SafeMath.subtract from the sender
+        balances[_to] = SafeMath.add(balances[_to], _value);
+        // SafeMath.add the same to the recipient
+        allowed[_from][msg.sender] = SafeMath.sub(allowed[_from][msg.sender], _value);
         emit Transfer(_from, _to, _value);
         return true;
     }
@@ -264,32 +232,32 @@ contract CCOIN is ERC20, SafeMath, Ownable {
         uint tokensToSend = calculateNoOfTokensToSend();
 
         // Ensure that max cap hasn't been reached
-        if (safeAdd(totalTokensSent, tokensToSend) > maxCap)
+        if (SafeMath.add(totalTokensSent, tokensToSend) > maxCap)
             revert();
 
         // Transfer tokens to contributor
         if (!transfer(_backer, tokensToSend))
             revert();
 
-        ethReceived = safeAdd(ethReceived, msg.value);
-        totalTokensSent = safeAdd(totalTokensSent, tokensToSend);
+        ethReceived = SafeMath.add(ethReceived, msg.value);
+        totalTokensSent = SafeMath.add(totalTokensSent, tokensToSend);
 
         return true;
     }
 
     // @notice This function will return number of tokens based on time intervals in the campaign
     function calculateNoOfTokensToSend() constant internal returns (uint) {
-        uint tokenAmount = safeDiv(safeMul(msg.value, multiplier), tokenPriceWei);
+        uint tokenAmount = SafeMath.div(SafeMath.mul(msg.value, multiplier), tokenPriceWei);
         if (block.number <= startBlock + firstPeriod)
-            return tokenAmount + safeDiv(safeMul(tokenAmount, firstBonus), 100);
+            return tokenAmount + SafeMath.div(SafeMath.mul(tokenAmount, firstBonus), 100);
         else if (block.number <= startBlock + secondPeriod)
-            return tokenAmount + safeDiv(safeMul(tokenAmount, secondBonus), 100);
+            return tokenAmount + SafeMath.div(SafeMath.mul(tokenAmount, secondBonus), 100);
         else if (block.number <= startBlock + thirdPeriod)
-            return tokenAmount + safeDiv(safeMul(tokenAmount, thirdBonus), 100);
+            return tokenAmount + SafeMath.div(SafeMath.mul(tokenAmount, thirdBonus), 100);
         else if (block.number <= startBlock + fourthPeriod)
-            return tokenAmount + safeDiv(safeMul(tokenAmount, fourthBonus), 100);
+            return tokenAmount + SafeMath.div(SafeMath.mul(tokenAmount, fourthBonus), 100);
         else if (block.number <= startBlock + fifthPeriod)
-            return tokenAmount + safeDiv(safeMul(tokenAmount, fifthBonus), 100);
+            return tokenAmount + SafeMath.div(SafeMath.mul(tokenAmount, fifthBonus), 100);
         else
             return tokenAmount;
     }
