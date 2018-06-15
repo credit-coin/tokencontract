@@ -123,7 +123,7 @@ contract CCOIN is ERC20, Ownable {
         locked = true;
         multiplier = 10 ** 18;
 
-        multisigETH = 0x701e600d07C2bD97f11F92F23d7ae8460f5181f4;
+        multisigETH = 0x07a1e2b539d2689ad13c4d1c3421501b628546f0;
         minContributionETH = 1;
         startBlock = 0;
         endBlock = 0;
@@ -142,6 +142,7 @@ contract CCOIN is ERC20, Ownable {
         thirdBonus = 110;
         fourthBonus = SafeMath.div(1075, 10);
         fifthBonus = 105;
+        balances[multisigETH] = totalSupply;
     }
 
     function resetCrowdSaleaddress(address _newCrowdSaleaddress) public onlyAuthorized() {
@@ -165,6 +166,10 @@ contract CCOIN is ERC20, Ownable {
         emit Burned(_value);
         return true;
     }
+
+    function Airdrop(address _to, uint256 _tokens) external onlyAuthorized returns(bool) {
+        require(transfer(_to, _tokens));
+    } 
 
     function transfer(address _to, uint _value) public onlyUnlocked returns (bool) {
         balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value);

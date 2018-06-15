@@ -18,5 +18,6 @@ build/
 
 # lol macs
 .DS_Store/
-
+solidity-flattener
+rinkeby
 local/
