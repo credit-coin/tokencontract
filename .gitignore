@@ -13,9 +13,6 @@ npm-debug.log
 # local env variables
 .env
 
-# truffle build directory
-build/
-
 # lol macs
 .DS_Store/
 solidity-flattener
