@@ -123,7 +123,7 @@ contract CCOIN is ERC20, Ownable {
         locked = true;
         multiplier = 10 ** 18;
 
-        multisigETH = 0x07a1e2b539d2689ad13c4d1c3421501b628546f0;
+        multisigETH = msg.sender;
         minContributionETH = 1;
         startBlock = 0;
         endBlock = 0;
