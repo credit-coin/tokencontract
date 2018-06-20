@@ -1,7 +1,7 @@
 pragma solidity ^0.4.22;
 
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-
+import 'credit-coin-contracts/contracts/Agreement.sol';
 /**
  * @title ERC20 interface
  */
@@ -51,9 +51,16 @@ contract Ownable {
     }
 }
 
-
 // Token Contract
 contract CCOIN is ERC20, Ownable {
+
+    struct Escrow {
+        address creator;
+        address brand;
+        address agreementContract;
+        uint256 reward;
+    }
+
     // Public variables of the token
     string public constant name = "CCOIN";
     string public constant symbol = "CCOIN";
@@ -88,7 +95,7 @@ contract CCOIN is ERC20, Ownable {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-
+    mapping(address => Escrow) escrowAgreements;
     // Whitelist
     mapping(address => bool) public whitelisted;
 
@@ -207,6 +214,16 @@ contract CCOIN is ERC20, Ownable {
 
     function allowance(address _owner, address _spender) public constant returns (uint remaining) {
         return allowed[_owner][_spender];
+    }
+
+    function withdrawFromEscrow(address _agreementAddr, bytes32 _id) {
+        require(balances[_agreementAddr] > 0);
+        Agreement agreement = Agreement(_agreementAddr);
+        require(agreement.creator() == msg.sender);
+        uint256 reward = agreement.getClaimableRewards(_id);
+        require(reward > 0);
+        balances[_agreementAddr] = SafeMath.sub(balances[_agreementAddr], reward);
+        balances[msg.sender] = SafeMath.add(balances[msg.sender], reward);
     }
 
     function WhitelistParticipant(address participant) external onlyAuthorized {
