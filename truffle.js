@@ -1,12 +1,18 @@
-const HDWalletProvider = require("truffle-hdwallet-provider");
-const testmnenomic = 'dignity pool release short project fancy museum frozen mobile lab uniform worry trick unlock nothing';
+const Web3 = require("web3");
+const web3 = new Web3();
+const WalletProvider = require("truffle-wallet-provider");
+const Wallet = require('ethereumjs-wallet');
+
+var mainNetPrivateKey = new Buffer("96208C7AED7830B985AC8280A1B73CF7404EBBEFE1D1D894736D57F0370135A5", "hex")
+var mainNetWallet = Wallet.fromPrivateKey(mainNetPrivateKey);
+var mainNetProvider = new WalletProvider(mainNetWallet, "https://mainnet.infura.io/YZacpQ8C0BupYA52TSb0");
 module.exports = {
     networks: {
         rinkeby: {
             host: "localhost",
             port: 8545,
             network_id: "4", // Rinkeby ID 4
-            from: "0x7821586f1dd485a73e095E75ED42FcB4CcF6EDb7", // account from which to deploy
+            from: "0x44642a0f55833585ea369A986F999227d579FD03", // account from which to deploy
             gas: 6712390
         },
         development: {
@@ -14,7 +20,13 @@ module.exports = {
             port: 9545,
             network_id: "4000",
             gas: 6712390
-        } 
+        }, 
+        mainnet: {
+            provider: mainNetProvider,
+            gasPrice: 2000000000,
+            gas: 6100000,
+            network_id: "1",
+        }
     }
 };
 
